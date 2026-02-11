@@ -20,4 +20,7 @@ jobs:
           pip install buildozer cython
 
       - name: Build with Buildozer
+        run: buildozer android debug --accept-sdk-license
+
+      - name: Build with Buildozer
         run: yes | buildozer android debug
