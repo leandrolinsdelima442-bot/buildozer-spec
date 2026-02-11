@@ -12,7 +12,7 @@ class SuperMatrizApp(App):
     def build(self):
         self.title = "Super Matriz Karma Pro - Android"
         
-        # Gerando os 10.000 jogos de forma eficiente para não travar o robô
+        # Gerando os 10.000 jogos de forma eficiente para o robô não travar
         self.loterias = {"00001 - Brasil - Mega-Sena": 6}
         paises = ["Brasil", "EUA", "Japão", "Alemanha", "França", "Itália", "Argentina", "Portugal"]
         for i in range(2, 10001):
@@ -30,7 +30,7 @@ class SuperMatrizApp(App):
         self.spinner.bind(text=self.on_spinner_change)
         layout_principal.add_widget(self.spinner)
 
-        # Área de Entrada de Dezenas
+        # Entrada de Dezenas
         self.layout_entrada = GridLayout(cols=10, size_hint_y=None, height=100)
         layout_principal.add_widget(self.layout_entrada)
 
@@ -39,7 +39,7 @@ class SuperMatrizApp(App):
         btn_calc.bind(on_press=self.calcular)
         layout_principal.add_widget(btn_calc)
 
-        # Área da Matriz com Rolagem (Scroll)
+        # Área da Matriz com Scroll
         scroll = ScrollView()
         self.grid_matriz = GridLayout(cols=1, size_hint_y=None, spacing=5)
         self.grid_matriz.bind(minimum_height=self.grid_matriz.setter('height'))
@@ -68,14 +68,10 @@ class SuperMatrizApp(App):
         for i, nivel in enumerate(niveis):
             linha = BoxLayout(size_hint_y=None, height=50)
             cor_fundo = (1, 0.8, 0, 1) if "KARMA 0" in nivel else (0.2, 0.2, 0.2, 1)
-            
             linha.add_widget(Button(text=nivel, size_hint_x=0.3, background_color=cor_fundo))
-            
             for d in dezenas:
-                # Lógica do Karma: pega o último dígito e soma o ajuste
                 res = (int(d[-1]) + ajustes[i]) % 10
                 linha.add_widget(Label(text=str(res), font_size=24))
-            
             self.grid_matriz.add_widget(linha)
 
 if __name__ == '__main__':
