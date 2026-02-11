@@ -2,7 +2,8 @@
 title = Super Matriz Karma Pro
 package.name = matrizkarmapro
 package.domain = org.leandro
-source.dir = source.main = main.py
+source.dir = .  
+source.main = main.py
 source.include_exts = py,png,jpg,ttf
 version = 1.0.0
 requirements = python3,kivy
