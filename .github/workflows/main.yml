@@ -1,16 +1,73 @@
-name: Build APK
-on: [push, pull_request]
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.spinner import Spinner
+from kivy.uix.textinput import TextInput
+import random
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+class SuperMatrizApp(App):
+    def build(self):
+        self.title = "Super Matriz Karma Pro - Android"
+        
+        # Gerando os 10.000 jogos de forma leve
+        self.loterias = {"00001 - Brasil - Mega-Sena": 6}
+        paises = ["Brasil", "EUA", "Japão", "Alemanha", "França", "Itália"]
+        for i in range(2, 10001):
+            nome = f"{i:05d} - {random.choice(paises)} Lotto"
+            self.loterias[nome] = random.choice([5, 6, 15, 20])
 
-      - name: Build with Buildozer
-        uses: jreleaser/buildozer-action@v1
-        with:
-          buildozer_version: master
-          command: buildozer android debug
-          repository_root: .
-          
+        layout_principal = BoxLayout(orientation='vertical', padding=10, spacing=10)
+
+        # Seleção do Jogo
+        self.spinner = Spinner(text="Selecione o Jogo", values=sorted(self.loterias.keys()))
+        self.spinner.bind(text=self.on_spinner_change)
+        layout_principal.add_widget(self.spinner)
+
+        # Área de Entrada
+        self.layout_entrada = GridLayout(cols=10, size_hint_y=None, height=100)
+        layout_principal.add_widget(self.layout_entrada)
+
+        # Botão Calcular
+        btn_calc = Button(text="CALCULAR MATRIZ", size_hint_y=None, height=50, background_color=(0, 1, 0, 1))
+        btn_calc.bind(on_press=self.calcular)
+        layout_principal.add_widget(btn_calc)
+
+        # Área da Matriz (Scroll)
+        scroll = ScrollView()
+        self.grid_matriz = GridLayout(cols=1, size_hint_y=None)
+        self.grid_matriz.bind(minimum_height=self.grid_matriz.setter('height'))
+        scroll.add_widget(self.grid_matriz)
+        layout_principal.add_widget(scroll)
+
+        return layout_principal
+
+    def on_spinner_change(self, spinner, text):
+        self.layout_entrada.clear_widgets()
+        self.entradas = []
+        qtd = self.loterias[text]
+        for i in range(qtd):
+            en = TextInput(multiline=False, input_filter='int', halign='center')
+            self.layout_entrada.add_widget(en)
+            self.entradas.append(en)
+
+    def calcular(self, instance):
+        self.grid_matriz.clear_widgets()
+        dezenas = [e.text for e in self.entradas if e.text]
+        if not dezenas: return
+
+        niveis = ["+ 2", "+ 1", "KARMA 0", "- 1", "- 2", "- 3"]
+        ajustes = [2, 1, 0, 9, 8, 7]
+
+        for i, nivel in enumerate(niveis):
+            linha = BoxLayout(size_hint_y=None, height=40)
+            linha.add_widget(Label(text=nivel, width=100, size_hint_x=None))
+            for d in dezenas:
+                res = (int(d[-1]) + ajustes[i]) % 10
+                linha.add_widget(Label(text=str(res)))
+            self.grid_matriz.add_widget(linha)
+
+if __name__ == '__main__':
+    SuperMatrizApp().run()
